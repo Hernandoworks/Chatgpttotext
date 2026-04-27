@@ -1,0 +1,8 @@
+{
+  "name": "chatgpt-share-extractor",
+  "version": "1.0.0",
+  "description": "Extract conversation text from ChatGPT share links",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.12"
+  }
+}

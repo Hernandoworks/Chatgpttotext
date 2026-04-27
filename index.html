@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Share → Text</title>
+    <style>
+        body { font-family: system-ui; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        input, textarea, button { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; }
+        button { background: #10a37f; color: white; border: none; cursor: pointer; }
+        textarea { height: 400px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🧠 ChatGPT Share Link → Plain Text</h1>
+    <input type="text" id="url" placeholder="Paste share link (https://chat.openai.com/share/...)" />
+    <button id="extractBtn">Extract Conversation</button>
+    <div id="error" style="color:red"></div>
+    <h3>Result (copy this into your Google Doc)</h3>
+    <textarea id="output" readonly></textarea>
+    <script>
+        const urlInput = document.getElementById('url');
+        const extractBtn = document.getElementById('extractBtn');
+        const outputArea = document.getElementById('output');
+        const errorDiv = document.getElementById('error');
+
+        extractBtn.addEventListener('click', async () => {
+            const shareUrl = urlInput.value.trim();
+            if (!shareUrl) {
+                errorDiv.textContent = 'Please enter a share link.';
+                return;
+            }
+            errorDiv.textContent = '';
+            outputArea.value = 'Loading...';
+            extractBtn.disabled = true;
+            try {
+                const res = await fetch('/api/extract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: shareUrl })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Unknown error');
+                outputArea.value = data.text;
+            } catch (err) {
+                errorDiv.textContent = `Error: ${err.message}`;
+                outputArea.value = '';
+            } finally {
+                extractBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
